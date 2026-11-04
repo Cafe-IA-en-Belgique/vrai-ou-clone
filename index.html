@@ -118,6 +118,21 @@ p{margin:0}
 #recap[hidden]{display:none!important}
 .closing{border-top:2px solid var(--purple);padding-top:14px;font-family:var(--display);font-weight:700;font-size:1.08rem;line-height:1.4;color:var(--purple)}
 .closing a{color:inherit}
+.membership h2{font-size:1.25rem;color:var(--purple)}
+.membership p,.membership label{font-size:.95rem;line-height:1.5}
+.membership form{display:flex;flex-direction:column;gap:14px}
+.membership .email-field{display:flex;flex-direction:column;gap:6px}
+.membership input[type="email"]{width:100%;min-height:46px;padding:11px 12px;
+  border:2px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.membership input:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.membership .consent{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.membership input[type="checkbox"]{width:20px;height:20px;flex-shrink:0;margin:2px 0 0;accent-color:var(--purple)}
+.membership .privacy{font-size:.8rem;color:var(--muted)}
+.membership .signup-status{font-size:.95rem;line-height:1.5;font-weight:700}
+.membership .signup-status.success{color:var(--green)}
+.membership .signup-status.error{color:var(--red)}
+.membership button:disabled{opacity:.65;cursor:wait}
+.membership .honeypot{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 
@@ -136,8 +151,69 @@ p{margin:0}
   <div class="hive" id="hive" aria-hidden="true"></div>
   <div class="card" id="card" aria-live="polite"></div>
 
+  <section class="card membership" aria-labelledby="membership-title">
+    <h2 id="membership-title">Rejoignez le Café IA</h2>
+    <p>Recevez les prochaines dates et les nouvelles du Café IA à Bruxelles.</p>
+    <form id="membership-form" method="POST" action="https://8604390b.sibforms.com/serve/MUIFAEjx5RTQwiLS45GE-4vLVsZwIhzGYJ_4mB1gqXXSrg001k_sWIR_kyLi88CQzo0LZYS_Hd3qpEm3ZoKjnTWzeXetXzJAB_haXiyo5zrBC3w-olS2nDFDbJM6JeoAgSmGoWEe8DSDGZb-oBUBLcMIQfmUiaMtTE8mrxkVdWj21nrzNFh9Z0RqafSEWOKoY4QNOLGGjuAp6petXw==" target="_blank" rel="noopener noreferrer" aria-describedby="membership-privacy">
+      <div class="email-field">
+        <label for="membership-email">Votre adresse email</label>
+        <input type="email" id="membership-email" name="EMAIL" autocomplete="email" placeholder="vous@exemple.be" maxlength="254" required>
+      </div>
+      <label class="consent" for="membership-consent">
+        <input type="checkbox" id="membership-consent" name="OPT_IN" value="1" required>
+        <span>J’accepte de recevoir par email les prochaines dates et les nouvelles du Café IA.</span>
+      </label>
+      <p class="privacy" id="membership-privacy">Votre adresse est enregistrée dans Brevo pour cet envoi. Vous pouvez vous désinscrire à tout moment via le lien présent dans nos emails. Cette inscription est facultative et indépendante du quiz.</p>
+      <div class="honeypot" aria-hidden="true">
+        <label for="membership-check">Laissez ce champ vide</label>
+        <input type="text" id="membership-check" name="email_address_check" value="" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" name="locale" value="fr">
+      <input type="hidden" name="html_type" value="simple">
+      <button class="btn" type="submit">M’inscrire aux nouvelles</button>
+      <p class="signup-status" id="membership-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+      <noscript><p class="privacy">La confirmation Brevo s’ouvre dans un nouvel onglet pour conserver votre progression dans le quiz.</p></noscript>
+    </form>
+  </section>
+
   <p class="foot">Café IA Bruxelles · faits vérifiés au 3 novembre 2026. Les lois et les outils évoluent vite&nbsp;: chaque réponse renvoie à sa source.</p>
 </div>
+
+<script>
+(function(){
+  var form = document.getElementById('membership-form');
+  var status = document.getElementById('membership-status');
+  var button = form.querySelector('button[type="submit"]');
+  form.addEventListener('submit', async function(event){
+    event.preventDefault();
+    if (button.disabled) return;
+    button.disabled = true;
+    button.textContent = 'Inscription en cours…';
+    form.setAttribute('aria-busy', 'true');
+    status.hidden = false;
+    status.className = 'signup-status';
+    status.textContent = 'Envoi de votre inscription…';
+    try {
+      var response = await fetch(form.action, {
+        method: 'POST', body: new FormData(form), credentials: 'omit',
+        signal: AbortSignal.timeout(20000)
+      });
+      var result = await response.json();
+      if (!response.ok || result.success !== true) throw new Error('signup-failed');
+      status.className = 'signup-status success';
+      status.textContent = 'Merci ! Votre inscription aux nouvelles du Café IA est confirmée. À bientôt !';
+      form.reset();
+    } catch (error) {
+      status.className = 'signup-status error';
+      status.textContent = 'Impossible de confirmer votre inscription pour le moment. Vérifiez votre connexion et réessayez.';
+    } finally {
+      button.disabled = false;
+      button.textContent = 'M’inscrire aux nouvelles';
+      form.removeAttribute('aria-busy');
+    }
+  });
+})();
+</script>
 
 <script>
 (function(){

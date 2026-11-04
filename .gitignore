@@ -2,3 +2,7 @@
 /Vrai*.html
 /*.md.txt
 /*.mpeg
+
+# Les clés Brevo restent locales, hors du site publié.
+.env
+.env.*
