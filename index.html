@@ -151,7 +151,7 @@ p{margin:0}
   <div class="hive" id="hive" aria-hidden="true"></div>
   <div class="card" id="card" aria-live="polite"></div>
 
-  <section class="card membership" aria-labelledby="membership-title">
+  <section class="card membership" id="membership" aria-labelledby="membership-title" hidden>
     <h2 id="membership-title">Rejoignez le Café IA</h2>
     <p>Recevez les prochaines dates et les nouvelles du Café IA à Bruxelles.</p>
     <form id="membership-form" method="POST" action="https://8604390b.sibforms.com/serve/MUIFAEjx5RTQwiLS45GE-4vLVsZwIhzGYJ_4mB1gqXXSrg001k_sWIR_kyLi88CQzo0LZYS_Hd3qpEm3ZoKjnTWzeXetXzJAB_haXiyo5zrBC3w-olS2nDFDbJM6JeoAgSmGoWEe8DSDGZb-oBUBLcMIQfmUiaMtTE8mrxkVdWj21nrzNFh9Z0RqafSEWOKoY4QNOLGGjuAp6petXw==" target="_blank" rel="noopener noreferrer" aria-describedby="membership-privacy">
@@ -300,6 +300,7 @@ p{margin:0}
 
   var hive = document.getElementById('hive');
   var card = document.getElementById('card');
+  var membership = document.getElementById('membership');
   var state, order;
 
   function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -327,6 +328,7 @@ p{margin:0}
   }
 
   function reset(){
+    membership.hidden = true;
     state = {i:0, picks:[]};
     order = Q.map(function(q){ return q.fixed ? q.o.map(function(_,i){return i;}) : shuffle(q.o.length); });
     Q.forEach(function(q){
@@ -408,6 +410,7 @@ p{margin:0}
 
   function renderFinal(){
     paint(true);
+    membership.hidden = false;
     var score = 0;
     Q.forEach(function(q,k){ if (state.picks[k] === q.c) score++; });
     var closing = score >= 7

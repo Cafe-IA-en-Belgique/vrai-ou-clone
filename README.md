@@ -18,7 +18,8 @@ sur la branche `main`.
 
 ## Inscription aux nouvelles du Café IA
 
-Le formulaire sous le quiz envoie directement les inscriptions au formulaire
+Le formulaire apparaît uniquement après la dernière réponse, sous le résultat du quiz,
+et se masque lorsqu’on rejoue. Il envoie directement les inscriptions au formulaire
 public Brevo « Membres du Café IA — Vrai ou Cloné », relié à la liste
 « Membres du Café IA » (ID `3`). Il utilise l’intégration HTML simple de Brevo :
 email obligatoire, consentement obligatoire non précoché et champ piège antispam.
